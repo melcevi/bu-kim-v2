@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bu Kim? - v2</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #f5f5f5;
+    color: #1a1a1a;
+    min-height: 100vh;
+  }
+
+  .page {
+    display: none !important;
+    min-height: 100vh;
+    padding: 24px 16px 48px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .page.active { display: block !important; }
+
+  /* ── COVER PAGE ── */
+  #page-cover {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 48px 24px;
+  }
+  #page-cover.active { display: flex !important; }
+
+  .cover-eyebrow {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 20px;
+  }
+  .cover-title {
+    font-size: clamp(2.8rem, 10vw, 5rem);
+    font-weight: 800;
+    letter-spacing: -2px;
+    line-height: 1;
+    color: #111;
+    margin-bottom: 8px;
+  }
+  .cover-subtitle {
+    font-size: clamp(1rem, 3vw, 1.3rem);
+    color: #555;
+    margin-bottom: 32px;
+    line-height: 1.5;
+  }
+  .cover-desc {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px 24px;
+    font-size: 0.95rem;
+    color: #444;
+    line-height: 1.7;
+    max-width: 480px;
+    margin-bottom: 32px;
+    text-align: left;
+  }
+  .cover-desc p + p { margin-top: 10px; }
+
+  /* ── BUTTONS ── */
+  .btn-primary {
+    background: #111;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 16px 40px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    width: 100%;
+    max-width: 320px;
+  }
+  .btn-primary:hover { background: #333; }
+  .btn-primary:active { transform: scale(0.98); }
+
+  .btn-secondary {
+    background: transparent;
+    color: #111;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    padding: 14px 32px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    width: 100%;
+    max-width: 320px;
+    margin-top: 10px;
+  }
+  .btn-secondary:hover { border-color: #999; }
+
+  /* ── DEMOGRAPHICS ── */
+  .section-header {
+    margin-bottom: 28px;
+  }
+  .section-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .section-header p {
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .form-group {
+    margin-bottom: 22px;
+  }
+  .form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+  }
+  .form-group .hint {
+    display: block;
+    font-weight: 400;
+    color: #888;
+    font-size: 0.82rem;
+    margin-bottom: 8px;
+  }
+
+  input[type="number"],
+  input[type="text"],
+  select,
+  textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    background: #fff;
+    transition: border-color 0.15s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #111;
+  }
+
+  .radio-group, .checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .radio-option, .checkbox-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    border: 1.5px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    font-size: 0.95rem;
+    background: #fff;
+  }
+  .radio-option:hover, .checkbox-option:hover { border-color: #aaa; background: #fafafa; }
+  .radio-option input, .checkbox-option input { accent-color: #111; width: 16px; height: 16px; }
+  .radio-option.selected, .checkbox-option.selected {
+    border-color: #111;
+    background: #f9f9f9;
+  }
+
+  .other-input {
+    margin-top: 8px;
+    display: none;
+  }
+  .other-input.visible { display: block !important; }
+
+  /* ── PROGRESS ── */
+  .progress-bar-wrap {
+    background: #e8e8e8;
+    border-radius: 99px;
+    height: 4px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: #111;
+    border-radius: 99px;
+    transition: width 0.4s ease;
+  }
+  .progress-label {
+    font-size: 0.8rem;
+    color: #888;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* ── FACE PAGE ── */
+  #page-faces { padding-top: 20px; }
+
+  .face-card {
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #e8e8e8;
+    margin-bottom: 20px;
+  }
+  .face-img-wrap {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .face-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .face-img-wrap .img-loading {
+    font-size: 0.85rem;
+    color: #aaa;
+  }
+
+  .face-actions {
+    padding: 20px;
+  }
+  .face-question {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 14px;
+    color: #222;
+  }
+
+  .recognition-btns {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .rec-btn {
+    flex: 1;
+    min-width: 80px;
+    padding: 13px 8px;
+    border-radius: 10px;
+    border: 2px solid #ddd;
+    background: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .rec-btn:hover { border-color: #999; }
+  .rec-btn.selected-yes { border-color: #111; background: #111; color: #fff; }
+  .rec-btn.selected-no { border-color: #bbb; background: #f5f5f5; color: #555; }
+  .rec-btn.selected-unsure { border-color: #999; background: #f0f0f0; color: #444; }
+
+  .name-input-wrap {
+    margin-top: 16px;
+    display: none;
+  }
+  .name-input-wrap.visible { display: block !important; }
+  .name-input-wrap label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: block;
+    color: #333;
+  }
+
+  .face-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 20px 20px;
+  }
+  .btn-next-face {
+    flex: 1;
+    background: #111;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-next-face:hover { background: #333; }
+  .btn-next-face:disabled { background: #ccc; cursor: not-allowed; }
+
+  /* ── THANK YOU ── */
+  #page-done {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 100vh;
+    padding: 48px 24px;
+  }
+  #page-done.active { display: flex !important; }
+  .done-icon { font-size: 4rem; margin-bottom: 20px; }
+  .done-title { font-size: 2rem; font-weight: 800; margin-bottom: 12px; }
+  .done-msg { color: #555; line-height: 1.6; max-width: 380px; }
+
+  /* ── SUBMISSION STATUS ── */
+  .submit-status {
+    margin-top: 16px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    display: none;
+  }
+  .submit-status.sending { display: block; background: #f0f4ff; color: #3355cc; }
+  .submit-status.success { display: block; background: #f0fff4; color: #1a7a3a; }
+  .submit-status.error   { display: block; background: #fff0f0; color: #cc2222; }
+
+  /* ── UTILITIES ── */
+  .nav-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 28px;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .required-note {
+    font-size: 0.8rem;
+    color: #999;
+    margin-bottom: 20px;
+  }
+
+  .error-msg {
+    font-size: 0.82rem;
+    color: #cc2222;
+    margin-top: 6px;
+    display: none;
+  }
+  .error-msg.visible { display: block !important; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     SAYFA 1: KAPAK
+════════════════════════════════════════════ -->
+<div id="page-cover" class="page active">
+  <div class="cover-eyebrow">Araştırma Anketi</div>
+  <div class="cover-title">Bu Kim?</div>
+  <div class="cover-subtitle">Size göstereceğimiz ünlü yüzleri tanıyabilecek misiniz?</div>
+
+  <div class="cover-desc">
+    <p>Bu çalışmada size bazı ünlülerin yüzlerini göstereceğiz ve isimlerini yazmanızı isteyeceğiz.</p>
+    <p><em>Araştırma detayları burada yer alacak. Metin düzenleniyor...</em></p>
+    <p>Katılımınız için teşekkür ederiz.</p>
+  </div>
+
+  <div id="resume_banner" style="display:none; background:#fff; border:1.5px solid #ddd; border-radius:12px; padding:18px 20px; max-width:400px; margin-bottom:20px; text-align:left;">
+    <div style="font-weight:700; margin-bottom:6px;">Yarım kalan anket var</div>
+    <div style="font-size:0.88rem; color:#555; margin-bottom:14px;">Kaldığınız yerden devam edebilir veya baştan başlayabilirsiniz.</div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn-primary" style="padding:12px 20px; font-size:0.9rem;" onclick="doResume()">Devam Et</button>
+      <button class="btn-secondary" style="padding:12px 20px; font-size:0.9rem; margin-top:0;" onclick="doFresh()">Baştan Başla</button>
+    </div>
+  </div>
+  <button class="btn-primary" id="start_btn" onclick="showPage('page-demo')">Ankete Başla →</button>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SAYFA 2: DEMOGRAFİK BİLGİLER
+════════════════════════════════════════════ -->
+<div id="page-demo" class="page">
+  <div class="section-header">
+    <h2>Genel Bilgiler</h2>
+    <p>Lütfen aşağıdaki soruları eksiksiz doldurunuz.</p>
+  </div>
+  <p class="required-note">* ile işaretli alanlar zorunludur.</p>
+
+  <!-- S1: Yaş -->
+  <div class="form-group">
+    <label for="q_yas">1. Yaşınız *</label>
+    <input type="number" id="q_yas" placeholder="Örn: 34" min="10" max="110">
+    <div class="error-msg" id="err_yas">Lütfen geçerli bir yaş giriniz.</div>
+  </div>
+
+  <!-- S2: Cinsiyet -->
+  <div class="form-group">
+    <label>2. Cinsiyetiniz *</label>
+    <div class="radio-group" id="q_cinsiyet">
+      <label class="radio-option"><input type="radio" name="cinsiyet" value="Erkek"> Erkek</label>
+      <label class="radio-option"><input type="radio" name="cinsiyet" value="Kadın"> Kadın</label>
+    </div>
+    <div class="error-msg" id="err_cinsiyet">Lütfen bir seçenek işaretleyiniz.</div>
+  </div>
+
+  <!-- S3: Eğitim -->
+  <div class="form-group">
+    <label for="q_egitim">3. Eğitim Düzeyiniz *</label>
+    <span class="hint">Mezun olduğunuz son eğitim düzeyini işaretleyiniz.</span>
+    <select id="q_egitim">
+      <option value="">— Seçiniz —</option>
+      <option>Okur-yazar değilim</option>
+      <option>İlkokul</option>
+      <option>Ortaokul</option>
+      <option>Lise</option>
+      <option>Üniversite</option>
+      <option>Yüksek lisans</option>
+      <option>Doktora</option>
+    </select>
+    <div class="error-msg" id="err_egitim">Lütfen eğitim düzeyinizi seçiniz.</div>
+  </div>
+
+  <!-- S4: Yıl sayısı -->
+  <div class="form-group">
+    <label for="q_egitim_yil">4. İlkokul dahil kaç yıl eğitim aldınız? *</label>
+    <input type="number" id="q_egitim_yil" placeholder="Örn: 12" min="0" max="30">
+    <div class="error-msg" id="err_egitim_yil">Lütfen geçerli bir yıl sayısı giriniz.</div>
+  </div>
+
+  <!-- S5: Meslek -->
+  <div class="form-group">
+    <label for="q_meslek">5. Mesleğiniz *</label>
+    <input type="text" id="q_meslek" placeholder="Örn: Öğretmen, mühendis...">
+    <div class="error-msg" id="err_meslek">Lütfen mesleğinizi giriniz.</div>
+  </div>
+
+  <!-- S6: Gelir -->
+  <div class="form-group">
+    <label>6. Gelir Düzeyiniz *</label>
+    <div class="radio-group" id="q_gelir">
+      <label class="radio-option"><input type="radio" name="gelir" value="Düşük"> Düşük</label>
+      <label class="radio-option"><input type="radio" name="gelir" value="Düşük-Orta"> Düşük-Orta</label>
+      <label class="radio-option"><input type="radio" name="gelir" value="Orta"> Orta</label>
+      <label class="radio-option"><input type="radio" name="gelir" value="Orta-Yüksek"> Orta-Yüksek</label>
+      <label class="radio-option"><input type="radio" name="gelir" value="Yüksek"> Yüksek</label>
+    </div>
+    <div class="error-msg" id="err_gelir">Lütfen bir seçenek işaretleyiniz.</div>
+  </div>
+
+  <!-- S7: Türkiye'de yaşama süresi -->
+  <div class="form-group">
+    <label>7. Toplam kaç yıl Türkiye'de yaşadınız / yaşıyorsunuz? *</label>
+    <div class="radio-group" id="q_turkiye">
+      <label class="radio-option"><input type="radio" name="turkiye" value="Tüm hayatım boyunca"> Tüm hayatım boyunca</label>
+      <label class="radio-option" id="turkiye_diger_opt"><input type="radio" name="turkiye" value="Diğer"> Diğer</label>
+    </div>
+    <div class="other-input" id="turkiye_diger_input">
+      <input type="text" id="q_turkiye_diger" placeholder="Kaç yıl? (Örn: 15 yıl)">
+    </div>
+    <div class="error-msg" id="err_turkiye">Lütfen bir seçenek işaretleyiniz.</div>
+  </div>
+
+  <!-- S8: Şehir -->
+  <div class="form-group">
+    <label for="q_sehir">8. Hayatınızın büyük çoğunluğunu hangi şehirde geçirdiniz? *</label>
+    <input type="text" id="q_sehir" placeholder="Örn: İstanbul, Ankara...">
+    <div class="error-msg" id="err_sehir">Lütfen şehir adı giriniz.</div>
+  </div>
+
+  <!-- S9: Konum -->
+  <div class="form-group">
+    <label>9. Bu şehrin neresinde yaşadınız? *</label>
+    <div class="radio-group" id="q_konum">
+      <label class="radio-option"><input type="radio" name="konum" value="Şehir merkezi"> Şehir merkezi</label>
+      <label class="radio-option"><input type="radio" name="konum" value="Şehir merkezinin dışında"> Şehir merkezinin dışında</label>
+    </div>
+    <div class="error-msg" id="err_konum">Lütfen bir seçenek işaretleyiniz.</div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn-primary" onclick="submitDemographics()">Devam Et →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SAYFA 3: YÜZLER
+════════════════════════════════════════════ -->
+<div id="page-faces" class="page">
+
+  <div class="progress-label">
+    <span id="prog_label">Fotoğraf 1 / 96</span>
+    <span id="prog_pct">0%</span>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="prog_fill" style="width:0%"></div>
+  </div>
+
+  <div class="face-card">
+    <div class="face-img-wrap">
+      <span class="img-loading" id="img_loading">Yükleniyor…</span>
+      <img id="face_img" src="" alt="Yüz fotoğrafı" style="display:none"
+           onload="document.getElementById('img_loading').style.display='none'; this.style.display='block';"
+           onerror="document.getElementById('img_loading').textContent='Fotoğraf yüklenemedi';">
+    </div>
+    <div class="face-actions">
+      <div class="face-question">Bu kişiyi tanıyor musunuz?</div>
+      <div class="recognition-btns">
+        <button class="rec-btn" id="btn_yes"    onclick="selectRecognition('yes')">Tanıyorum</button>
+        <button class="rec-btn" id="btn_no"     onclick="selectRecognition('no')">Tanımıyorum</button>
+        <button class="rec-btn" id="btn_unsure" onclick="selectRecognition('unsure')">Emin Değilim</button>
+      </div>
+
+      <div class="name-input-wrap" id="name_wrap">
+        <label for="name_input">Bu kişinin tam adını yazınız:</label>
+        <input type="text" id="name_input" placeholder="Ad Soyad giriniz…">
+      </div>
+    </div>
+
+    <div class="face-nav">
+      <button class="btn-next-face" id="btn_next" onclick="nextFace()" disabled>
+        Sonraki →
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════
+     SAYFA 4: BİTİŞ
+════════════════════════════════════════════ -->
+<div id="page-done" class="page">
+  <div class="done-icon">🎉</div>
+  <div class="done-title">Teşekkürler!</div>
+  <div class="done-msg">Yanıtlarınız başarıyla kaydedildi. Katkınız için çok teşekkür ederiz.</div>
+  <div class="submit-status" id="submit_status"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════ -->
+<script>
+// ── GOOGLE SHEETS ENTEGRASYONU ──────────────────────────
+// Aşağıdaki URL'yi Google Apps Script web app URL'iniz ile değiştirin.
+// Kurulum talimatları: bu dosya ile birlikte gönderilen README'ye bakın.
+const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbw5i3hQpvJntMI81DSdeg73kk96buyHxGrDKxfUk8iHRRGvMcBhtEnqnMvMfuP0ImIzag/exec";
+// ────────────────────────────────────────────────────────
+
+const PHOTOS = [
+  { id: "1tOZ74T3V8Sjsr2iF2SxMnCuSqstkTh0_", name: "1 Abdullah Gül", url: "https://lh3.googleusercontent.com/d/1tOZ74T3V8Sjsr2iF2SxMnCuSqstkTh0_=w800" },
+  { id: "1hvYGv3ZDd1LynevpTkNtAo5kiiNYexB6", name: "2 Adile Naşit", url: "https://lh3.googleusercontent.com/d/1hvYGv3ZDd1LynevpTkNtAo5kiiNYexB6=w800" },
+  { id: "1DtdbAFK5L3oY3Y-jjokMNfWgqCArWvzH", name: "3 Adnan Menderes", url: "https://lh3.googleusercontent.com/d/1DtdbAFK5L3oY3Y-jjokMNfWgqCArWvzH=w800" },
+  { id: "1D_j2d50-IoOXjZ5CS_veFwmGXROXo4sc", name: "4 Ahmet Kaya (gözlüklü)", url: "https://lh3.googleusercontent.com/d/1D_j2d50-IoOXjZ5CS_veFwmGXROXo4sc=w800" },
+  { id: "18Gkcj1mx4VgJ7vYGNTNjMWkIqr1DSoIX", name: "5 Ajda Pekkan", url: "https://lh3.googleusercontent.com/d/18Gkcj1mx4VgJ7vYGNTNjMWkIqr1DSoIX=w800" },
+  { id: "19yPokVKHAH2SGc7C_12yRYwevLlyieOI", name: "6 Albert Einstein", url: "https://lh3.googleusercontent.com/d/19yPokVKHAH2SGc7C_12yRYwevLlyieOI=w800" },
+  { id: "1CramjGG7fwGAzuWaV8j5zuEsFqWUZSDs", name: "7 Alparslan Türkeş", url: "https://lh3.googleusercontent.com/d/1CramjGG7fwGAzuWaV8j5zuEsFqWUZSDs=w800" },
+  { id: "1wXsijDRy0ou3WT4U1kY-X__i5s0GQr1j", name: "8 Angela Merkel", url: "https://lh3.googleusercontent.com/d/1wXsijDRy0ou3WT4U1kY-X__i5s0GQr1j=w800" },
+  { id: "1yWBkYK5dzXrIGu8Sm9xtGWcjhSwketCG", name: "9 Arda Güler", url: "https://lh3.googleusercontent.com/d/1yWBkYK5dzXrIGu8Sm9xtGWcjhSwketCG=w800" },
+];
+
+// ── STATE ───────────────────────────────────────────────
+let demographics = {};
+let shuffledPhotos = [];
+let currentIndex = 0;
+let responses = [];
+let currentRecognition = null;
+
+// ── PAGE NAV ────────────────────────────────────────────
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ── RADIO HIGHLIGHT ─────────────────────────────────────
+document.addEventListener('change', function(e) {
+  if (e.target.type === 'radio') {
+    const group = e.target.closest('.radio-group');
+    if (group) {
+      group.querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
+      e.target.closest('.radio-option').classList.add('selected');
+    }
+    // "Diğer" toggle for türkiye question
+    if (e.target.name === 'turkiye') {
+      const digerInput = document.getElementById('turkiye_diger_input');
+      digerInput.className = 'other-input' + (e.target.value === 'Diğer' ? ' visible' : '');
+    }
+  }
+});
+
+// ── DEMOGRAPHICS VALIDATION ─────────────────────────────
+function submitDemographics() {
+  let valid = true;
+
+  function checkText(id, errId) {
+    const val = document.getElementById(id).value.trim();
+    const err = document.getElementById(errId);
+    if (!val) { err.classList.add('visible'); valid = false; return ''; }
+    err.classList.remove('visible'); return val;
+  }
+  function checkNumber(id, errId, min, max) {
+    const val = parseInt(document.getElementById(id).value);
+    const err = document.getElementById(errId);
+    if (isNaN(val) || val < min || val > max) { err.classList.add('visible'); valid = false; return null; }
+    err.classList.remove('visible'); return val;
+  }
+  function checkRadio(name, errId) {
+    const checked = document.querySelector(`input[name="${name}"]:checked`);
+    const err = document.getElementById(errId);
+    if (!checked) { err.classList.add('visible'); valid = false; return ''; }
+    err.classList.remove('visible'); return checked.value;
+  }
+  function checkSelect(id, errId) {
+    const val = document.getElementById(id).value;
+    const err = document.getElementById(errId);
+    if (!val) { err.classList.add('visible'); valid = false; return ''; }
+    err.classList.remove('visible'); return val;
+  }
+
+  const yas        = checkNumber('q_yas', 'err_yas', 10, 110);
+  const cinsiyet   = checkRadio('cinsiyet', 'err_cinsiyet');
+  const egitim     = checkSelect('q_egitim', 'err_egitim');
+  const egitimYil  = checkNumber('q_egitim_yil', 'err_egitim_yil', 0, 30);
+  const meslek     = checkText('q_meslek', 'err_meslek');
+  const gelir      = checkRadio('gelir', 'err_gelir');
+  const turkiyeRaw = checkRadio('turkiye', 'err_turkiye');
+  let   turkiye    = turkiyeRaw;
+  if (turkiyeRaw === 'Diğer') {
+    const d = document.getElementById('q_turkiye_diger').value.trim();
+    turkiye = d ? `Diğer: ${d}` : 'Diğer';
+  }
+  const sehir      = checkText('q_sehir', 'err_sehir');
+  const konum      = checkRadio('konum', 'err_konum');
+
+  if (!valid) { window.scrollTo(0,0); return; }
+
+  demographics = { yas, cinsiyet, egitim, egitimYil, meslek, gelir, turkiye, sehir, konum };
+
+  // Shuffle photos (Fisher-Yates)
+  shuffledPhotos = [...PHOTOS];
+  for (let i = shuffledPhotos.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledPhotos[i], shuffledPhotos[j]] = [shuffledPhotos[j], shuffledPhotos[i]];
+  }
+  currentIndex = 0;
+  responses = [];
+
+  showPage('page-faces');
+  loadFace();
+}
+
+// ── FACE LOGIC ───────────────────────────────────────────
+function loadFace() {
+  const photo = shuffledPhotos[currentIndex];
+  const total = shuffledPhotos.length;
+
+  // Progress
+  const pct = Math.round((currentIndex / total) * 100);
+  document.getElementById('prog_label').textContent = `Fotoğraf ${currentIndex + 1} / ${total}`;
+  document.getElementById('prog_pct').textContent = `${pct}%`;
+  document.getElementById('prog_fill').style.width = pct + '%';
+
+  // Image
+  const img = document.getElementById('face_img');
+  const loading = document.getElementById('img_loading');
+  img.style.display = 'none';
+  loading.style.display = 'block';
+  loading.textContent = 'Yükleniyor…';
+  img.src = photo.url;
+
+  // Reset UI
+  currentRecognition = null;
+  document.getElementById('btn_yes').className = 'rec-btn';
+  document.getElementById('btn_no').className = 'rec-btn';
+  document.getElementById('btn_unsure').className = 'rec-btn';
+  document.getElementById('name_wrap').className = 'name-input-wrap';
+  document.getElementById('name_input').value = '';
+  const isLast = currentIndex === shuffledPhotos.length - 1;
+  document.getElementById('btn_next').textContent = isLast ? 'Tamamla →' : 'Sonraki →';
+  document.getElementById('btn_next').disabled = true;
+  prefetchNext();
+}
+
+
+function prefetchNext() {
+  for (let i = 1; i <= 3; i++) {
+    const idx = currentIndex + i;
+    if (idx < shuffledPhotos.length) {
+      const img = new Image();
+      img.src = shuffledPhotos[idx].url;
+    }
+  }
+}
+
+function selectRecognition(choice) {
+  currentRecognition = choice;
+
+  document.getElementById('btn_yes').className    = 'rec-btn' + (choice === 'yes'    ? ' selected-yes'    : '');
+  document.getElementById('btn_no').className     = 'rec-btn' + (choice === 'no'     ? ' selected-no'     : '');
+  document.getElementById('btn_unsure').className = 'rec-btn' + (choice === 'unsure' ? ' selected-unsure' : '');
+
+  const nameWrap = document.getElementById('name_wrap');
+  nameWrap.className = 'name-input-wrap' + (choice === 'yes' || choice === 'unsure' ? ' visible' : '');
+
+  document.getElementById('btn_next').disabled = false;
+}
+
+function nextFace() {
+  const photo = shuffledPhotos[currentIndex];
+  const nameVal = document.getElementById('name_input').value.trim();
+
+  responses.push({
+    photo_id:    photo.id,
+    photo_name:  photo.name,
+    recognition: currentRecognition === 'yes' ? 'Tanıyorum' : currentRecognition === 'no' ? 'Tanımıyorum' : 'Emin Değilim',
+    given_name:  nameVal,
+  });
+
+  currentIndex++;
+  saveProgress();
+
+  if (currentIndex >= shuffledPhotos.length) {
+    // Show sending state before navigating away
+    const btn = document.getElementById('btn_next');
+    btn.disabled = true;
+    btn.textContent = 'Kaydediliyor…';
+    submitData();
+  } else {
+    loadFace();
+    // Update button text if this is the last photo
+    if (currentIndex === shuffledPhotos.length - 1) {
+      document.getElementById('btn_next').textContent = 'Tamamla →';
+    } else {
+      document.getElementById('btn_next').textContent = 'Sonraki →';
+    }
+    window.scrollTo(0, 0);
+  }
+}
+
+// ── INIT: check for saved progress ─────────────────────
+window.addEventListener('DOMContentLoaded', function() {
+  const saved = checkSavedProgress();
+  if (saved) {
+    document.getElementById('resume_banner').style.display = 'block';
+    document.getElementById('start_btn').style.display = 'none';
+  }
+});
+
+function doResume() {
+  const saved = checkSavedProgress();
+  if (saved) resumeProgress(saved);
+}
+
+function doFresh() {
+  clearProgress();
+  document.getElementById('resume_banner').style.display = 'none';
+  document.getElementById('start_btn').style.display = 'block';
+  showPage('page-demo');
+}
+// ────────────────────────────────────────────────────────
+
+// ── SUBMIT TO GOOGLE SHEETS ─────────────────────────────
+
+// ── LOCAL STORAGE PROGRESS ──────────────────────────────
+function saveProgress() {
+  const state = {
+    demographics: demographics,
+    shuffledIds: shuffledPhotos.map(p => p.id),
+    currentIndex: currentIndex,
+    responses: responses,
+  };
+  localStorage.setItem('bukim_progress', JSON.stringify(state));
+}
+
+function clearProgress() {
+  localStorage.removeItem('bukim_progress');
+}
+
+function checkSavedProgress() {
+  try {
+    const saved = localStorage.getItem('bukim_progress');
+    if (!saved) return false;
+    const state = JSON.parse(saved);
+    if (!state.currentIndex || state.currentIndex === 0) return false;
+    return state;
+  } catch(e) { return false; }
+}
+
+function resumeProgress(state) {
+  demographics = state.demographics;
+  responses = state.responses;
+  currentIndex = state.currentIndex;
+  // Rebuild shuffled array from saved ID order
+  const idMap = {};
+  PHOTOS.forEach(p => { idMap[p.id] = p; });
+  shuffledPhotos = state.shuffledIds.map(id => idMap[id]).filter(Boolean);
+  showPage('page-faces');
+  loadFace();
+}
+// ────────────────────────────────────────────────────────
+
+async function submitData() {
+  // Show a loading overlay on the face page while submitting
+  const btn = document.getElementById('btn_next');
+  if (btn) { btn.disabled = true; btn.textContent = 'Kaydediliyor…'; }
+
+  const payload = {
+    timestamp:    new Date().toISOString(),
+    demographics: demographics,
+    responses:    responses,
+  };
+
+  try {
+    // Use GET with encoded data - works reliably with Apps Script no-cors
+    const encoded = encodeURIComponent(JSON.stringify(payload));
+    await fetch(GOOGLE_SHEETS_URL + '?data=' + encoded, {
+      method: 'GET',
+      mode: 'no-cors',
+    });
+    clearProgress();
+    showPage('page-done');
+    const statusEl = document.getElementById('submit_status');
+    statusEl.className = 'submit-status success';
+    statusEl.textContent = '✓ Yanıtlarınız başarıyla kaydedildi.';
+  } catch (err) {
+    showPage('page-done');
+    const statusEl = document.getElementById('submit_status');
+    statusEl.className = 'submit-status error';
+    statusEl.textContent = 'Bağlantı hatası oluştu. Lütfen araştırmacıyla iletişime geçin.';
+    console.error(err);
+  }
+}
+</script>
+</body>
+</html>
